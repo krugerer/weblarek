@@ -1,10 +1,10 @@
 import "./scss/styles.scss";
-import { Catalog } from "./components/base/models/catalog";
-import { Basket } from "./components/base/models/basket";
-import { CustomerModel } from "./components/base/models/customer";
+import { Catalog } from "./components/models/catalog";
+import { Basket } from "./components/models/basket";
+import { CustomerModel } from "./components/models/customer";
 import { API_URL } from "./utils/constants";
 import { Api } from "./components/base/Api";
-import { AppApi } from "./components/base/models/appapi";
+import { AppApi } from "./components/models/appapi";
 
 import { apiProducts } from "./utils/data";
 
@@ -54,7 +54,6 @@ console.log(
 console.log('Товар с id "412" (не существует):', catalog.getProductById("412"));
 
 catalog.setProductId("b06cde61-912f-4663-9751-09956c0eed67");
-console.log("Сохранённый ID выбранного товара:", catalog.selectedProductId);
 console.log("Получение выбранного товара по ID:", catalog.getSelectedProduct());
 
 catalog.setProductId("412");

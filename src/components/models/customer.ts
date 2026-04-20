@@ -1,10 +1,11 @@
-import { ICustomer } from "../../../types";
+import { ICustomer } from "../../types";
+import { TPayment } from "../../types";
 
 export class CustomerModel {
-  payment: "card" | "cash" | "" = "";
-  email: string = "";
-  phone: string = "";
-  address: string = "";
+  protected payment: TPayment = "";
+  protected email: string = "";
+  protected phone: string = "";
+  protected address: string = "";
 
   constructor() {}
 
@@ -37,13 +38,18 @@ export class CustomerModel {
     phone?: string;
     address?: string;
   } {
-    const errors: { payment?: string; email?: string; phone?: string; address?: string } = {};
+    const errors: {
+      payment?: string;
+      email?: string;
+      phone?: string;
+      address?: string;
+    } = {};
 
-    if (!this.payment) errors.payment = 'Не выбран способ оплаты';
-    if (!this.email) errors.email = 'Не указан электронный адрес';
-    if (!this.phone) errors.phone = 'Не указан номер телефона';
-    if (!this.address) errors.address = 'Не указан адрес доставки';
+    if (!this.payment) errors.payment = "Не выбран способ оплаты";
+    if (!this.email) errors.email = "Не указан электронный адрес";
+    if (!this.phone) errors.phone = "Не указан номер телефона";
+    if (!this.address) errors.address = "Не указан адрес доставки";
 
     return errors;
-  };
+  }
 }
