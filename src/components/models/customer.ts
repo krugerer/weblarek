@@ -1,5 +1,6 @@
 import { ICustomer } from "../../types";
 import { TPayment } from "../../types";
+import { TValidation } from "../../types";
 
 export class CustomerModel {
   protected payment: TPayment = "";
@@ -32,18 +33,8 @@ export class CustomerModel {
     this.address = "";
   }
 
-  validate(): {
-    payment?: string;
-    email?: string;
-    phone?: string;
-    address?: string;
-  } {
-    const errors: {
-      payment?: string;
-      email?: string;
-      phone?: string;
-      address?: string;
-    } = {};
+  validate(): TValidation {
+    const errors: TValidation = {};
 
     if (!this.payment) errors.payment = "Не выбран способ оплаты";
     if (!this.email) errors.email = "Не указан электронный адрес";
