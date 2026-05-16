@@ -41,3 +41,49 @@ export interface IOrderResult {
   id: string;
   total: number;
 }
+
+export interface ICardData {
+    id: string;
+    title: string;
+    price: number | null;
+    image?: string;
+    category?: string;
+    description?: string;
+    index?: number;
+}
+
+export interface ICardActions {
+    onClick?: (event: MouseEvent) => void;
+    onAddToBasket?: (event: MouseEvent) => void;
+}
+
+export interface IOrderFormData {
+    payment: 'card' | 'cash';
+    address: string;
+}
+
+export interface IContactsFormData {
+    email: string;
+    phone: string;
+}
+
+export interface ISuccessActions {
+    onClick: () => void;
+}
+
+export interface IBasketData {
+    items: HTMLElement[];
+    total: number;
+}
+
+export interface IHeaderData {
+    counter: number;
+}
+
+export interface IGalleryData {
+    catalog: HTMLElement[];
+}
+
+export interface ISuccessData {
+    total: number;
+}

@@ -123,6 +123,50 @@ interface ICustomer {
   address: string;
 }
 
+#### Интерфейс CardData
+Содержит данные для карточки
+
+interface ICardData {
+    id: string;
+    title: string;
+    price: number | null;
+    image?: string;
+    category?: string;
+    description?: string;
+    index?: number;
+}
+
+#### Интерфейс CardActions
+Содержит действия карточки
+
+interface ICardActions {
+    onClick?: (event: MouseEvent) => void;
+    onAddToBasket?: (event: MouseEvent) => void;
+}
+
+#### Интерфейс OrderFormData
+Данные формы заказа
+
+interface IOrderFormData {
+    payment: 'card' | 'cash';
+    address: string;
+}
+
+#### Интерфейс ContactsFormData
+Данные формы контактов
+
+interface IContactsFormData {
+    email: string;
+    phone: string;
+}
+
+#### Интерфейс SuccessActions
+Действия для успешного окна
+
+interface ISuccessActions {
+    onClick: () => void;
+}
+
 ### Модели данных
 Содержатся классы для работы с данными
 
@@ -138,7 +182,7 @@ interface ICustomer {
 `items: IProduct[] = []` - Хранит массив всех товаров, доступных в каталоге. Инициализируется пустым массивом.
 `selectedProductId: string | null = null` - Хранит идентификатор выбранной карточки товара. 
 
-Методы:  
+Методы класса:  
 `setItems(products: IProduct[]): void` - Сохраняет массив товаров, полученные из параметра products, в поле items.
 
 `getItems(): IProduct[]` - Возвращает массив всех товаров из поля items.
@@ -159,7 +203,7 @@ interface ICustomer {
 Поля класса:
 `items: IProduct[] = []` - Хранит массив позиций в корзине
 
-Методы:
+Методы класса:
 
 `getItems(): IProduct[]` - Возвращает массив всех товаров в корзине
 
@@ -191,7 +235,7 @@ interface ICustomer {
 
 `address: string` - Адрес пользователя. Изначально пустая строка.
 
-Методы: 
+Методы класса: 
 
 `setData(data: Partial<ICustomer>)` - Сохраняет данные покупателя. Принимает объект с любыми полями. Переданные поля обновляются, остальные остаются без изменений.
 
@@ -214,8 +258,212 @@ interface ICustomer {
 
 `api: IApi` - Хранит экземпляр API для выполнения запросов.
 
-Методы:
+Методы класса:
 
 `getProducts(): Promise<IProductsResponse>` - Выполняет GET-запрос на эндпоинт /product/ и возвращает объект, полученный от сервера, в котором находится массив товаров.
 
 `postOrder(order: IOrder): Promise<IOrderResult>` - Выполняет POST-запрос на эндпоинт /order/ и передаёт в него данные, полученные в параметрах метода, а возвращает объект, подтверждающий покупку на определенную сумму.
+
+### Слой представления
+
+#### Класс Modal
+
+Отвечает за открытие и закрытие модального окна. Не имеет дочерних классов.
+
+Конструктор:  
+`constructor(container: HTMLElement)` - принимает DOM-элемент модального окна.
+
+Поля класса:  
+
+`protected modalContainer: HTMLElement` - Контейнер с контентом модального окна
+`protected closeButton: HTMLButtonElement` - Кнопка закрытия
+
+Методы класса: 
+
+`open: void` - Открывает модальное окно
+`close: void` - Закрывает модальное окно
+`setContent (content: HTMLElement): void` - Устанавливает содержимое модального окна
+`render(data: T): HTMLElement` - Наследуется от Component
+
+#### Класс Card<T>
+
+Базовый класс для всех карточек товара. Является дженериком, где `T` — тип данных, которые принимает карточка.
+
+Конструктор класса:
+
+`constructor(container: HTMLElement, actions?: ICardActions)` - принимает DOM-элемент карточки и опциональный объект с колбэками для действий (клик по карточке, клик по кнопке).
+
+Поля класса:
+
+`protected title: HTMLElement` - Элемент для названия товара
+`protected price: HTMLElement` - Элемент для цены товара
+`protected button: HTMLButtonElement` - Кнопка на карточке (может отсутствовать)
+`protected _id: string` - ID товара
+`protected actions: ICardActions` - Объект с колбэками для обработки событий (клик по карточке или кнопке)
+
+Методы класса:
+`set id(value: string): void` - Сеттер для ID товара
+`get id(): string` - Геттер для ID товара
+`set title(value: string): void` - Устанавливает название товара
+`set price(value: number \| null): void` - Устанавливает цену (если `null` — показывает «Бесценно»)
+`render(data?: Partial<T>): HTMLElement` - Отрисовывает карточку
+
+#### Класс CardCatalog
+
+Наследуется от `Card<ICardData>`. Отображает карточку товара в каталоге.
+
+Поля класса:
+`protected category: HTMLElement` - Элемент для категории товара
+`protected image: HTMLImageElement` - Элемент для изображения
+
+Методы:  
+`set category(value: string): void` - Устанавливает категорию и применяет соответствующий класс для стилизации
+`set image(value: string): void` - Устанавливает изображение
+
+#### Класс CardPreview
+
+Наследуется от `Card<ICardData>`. Отображает подробную информацию о товаре.
+
+Поля класса:
+
+`protected description: HTMLElement` - Элемент для описания товара
+`protected category: HTMLElement` - Элемент для категории
+`protected image: HTMLImageElement` - Элемент для изображения
+
+Методы класса: 
+
+`set description(value: string): void` - Устанавливает описание товара
+`set category(value: string): void` - Устанавливает категорию
+`set image(value: string): void` - Устанавливает изображение
+
+#### Класс CardBasket
+
+Наследуется от `Card<ICardData>`. Отображает товар в корзине с индексом и кнопкой удаления.
+
+Поля класса:  
+`protected index: HTMLElement` - Элемент для отображения порядкового номера
+`protected deleteButton: HTMLButtonElement` - Кнопка удаления товара из корзины
+
+Методы класса:  
+
+`set index(value: number): void` - Устанавливает порядковый номер товара
+
+#### Класс Form<T>
+
+Базовый класс для работы с формами. Является дженериком, где `T` — тип данных формы.
+
+Конструктор класса:  
+`constructor(container: HTMLFormElement)` - принимает DOM-элемент формы.
+
+Поля класса: 
+
+`protected submitButton: HTMLButtonElement` - Кнопка отправки формы
+`protected errorElement: HTMLElement` - Элемент для отображения ошибок валидации
+`protected inputs: NodeListOf<HTMLInputElement>` - Список всех полей ввода
+
+Методы класса:
+
+`setData(data: Partial<T>): void` - Заполняет поля формы переданными данными
+`getData(): T` - Возвращает объект с данными из формы
+`clearErrors(): void` - Очищает сообщения об ошибках
+`setValid(isValid: boolean): void` - Блокирует/разблокирует кнопку отправки
+`showError(field: keyof T, message: string): void` -Показывает ошибку для конкретного поля
+`render(data?: Partial<T>): HTMLElement` - Отрисовывает форму
+
+#### Класс OrderForm
+
+Наследуется от `Form<IOrderFormData>`. Отвечает за форму выбора способа оплаты и ввода адреса.
+
+Поля класса:  
+
+`protected cardButton: HTMLButtonElement` - Кнопка выбора оплаты картой
+`protected cashButton: HTMLButtonElement` - Кнопка выбора оплаты наличными
+`protected addressInput: HTMLInputElement` - Поле ввода адреса
+
+Методы класса: 
+
+`set payment(value: 'card' | 'cash'): void` - Устанавливает выбранный способ оплаты (визуально выделяет кнопку)
+`get payment(): 'card' | 'cash' | null` - Возвращает выбранный способ оплаты
+`set address(value: string): void` - Устанавливает адрес
+
+#### Класс ContactsForm
+
+Наследуется от `Form<IContactsFormData>`. Отвечает за форму ввода email и телефона.
+
+Поля класса:
+
+`protected emailInput: HTMLInputElement` - Поле ввода email
+`protected phoneInput: HTMLInputElement` - Поле ввода телефона
+
+Методы класса:  
+
+`set email(value: string): void` - Устанавливает email
+`set phone(value: string): void` - Устанавливает телефон
+
+#### Класс Basket
+
+Отвечает за отображение корзины с товарами.
+
+Конструктор класса:  
+`constructor(container: HTMLElement)` - принимает DOM-элемент корзины.
+
+Поля класса:
+
+`protected list: HTMLElement` - Элемент-список (ul) для карточек товаров
+`protected total: HTMLElement` - Элемент для отображения общей суммы
+`protected button: HTMLButtonElement` - Кнопка оформления заказа
+
+Методы класса:
+
+`set items(items: HTMLElement[]): void` - Устанавливает список карточек товаров
+`set total(value: number): void` - Устанавливает общую сумму
+`set disabled(value: boolean): void` - Блокирует/разблокирует кнопку оформления
+
+#### Класс Header
+
+Отвечает за отображение шапки сайта и счётчика корзины.
+
+Конструктор класса:
+
+`constructor(container: HTMLElement)` - принимает DOM-элемент шапки.
+
+Поля класса: 
+
+`protected basketButton: HTMLButtonElement` - Кнопка корзины
+`protected counterElement: HTMLElement` - Элемент для отображения счётчика
+
+Методы класса:
+
+`set counter(value: number): void` - Устанавливает значение счётчика корзины
+
+#### Класс Gallery
+
+Отвечает за отображение галереи карточек товаров.
+
+Конструктор класса:  
+`constructor(container: HTMLElement)` - принимает DOM-элемент галереи.
+
+Поля класса:  
+
+`protected catalogElement: HTMLElement` - Элемент-контейнер для карточек
+
+Методы класса:  
+
+`set catalog(items: HTMLElement[]): void` - Устанавливает массив карточек в галерею
+
+#### Класс Success
+
+Отвечает за отображение модального окна об успешном оформлении заказа.
+
+Конструктор класса: 
+
+`constructor(container: HTMLElement, actions?: ISuccessActions)` - принимает DOM-элемент и опциональный объект с колбэком на закрытие.
+
+Поля класса:
+
+`protected total: HTMLElement` - Элемент для отображения списанной суммы
+`protected closeButton: HTMLButtonElement` - Кнопка закрытия
+
+Методы класса:
+
+`set total(value: number): void` - Устанавливает списанную сумму

@@ -1,6 +1,7 @@
 import { ICustomer } from "../../types";
 import { TPayment } from "../../types";
 import { TValidation } from "../../types";
+import { IEvents } from "../base/Events";
 
 export class CustomerModel {
   protected payment: TPayment = "";
@@ -8,13 +9,14 @@ export class CustomerModel {
   protected phone: string = "";
   protected address: string = "";
 
-  constructor() {}
+  constructor(protected events: IEvents) {}
 
   setData(data: Partial<ICustomer>): void {
     if (data.payment !== undefined) this.payment = data.payment;
     if (data.email !== undefined) this.email = data.email;
     if (data.phone !== undefined) this.phone = data.phone;
     if (data.address !== undefined) this.address = data.address;
+    this.events.emit('customer:changed', this.getData());
   }
 
   getData(): ICustomer {
@@ -31,6 +33,7 @@ export class CustomerModel {
     this.email = "";
     this.phone = "";
     this.address = "";
+    this.events.emit('customer:changed', this.getData());
   }
 
   validate(): TValidation {
