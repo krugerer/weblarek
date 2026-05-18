@@ -1,4 +1,5 @@
 import { Component } from '../base/Component';
+import { ensureElement } from '../../utils/utils';
 import { IBasketData } from '../../types';
 import { IEvents } from '../base/Events';
 
@@ -9,23 +10,23 @@ export class Basket extends Component<IBasketData> {
 
     constructor(container: HTMLElement, protected events: IEvents) {
         super(container);
-        this.listElement = container.querySelector('.basket__list') as HTMLElement;
-        this.totalElement = container.querySelector('.basket__price') as HTMLElement;
-        this.buttonElement = container.querySelector('.basket__button') as HTMLButtonElement;
+        this.listElement = ensureElement<HTMLElement>('.basket__list', container);
+        this.totalElement = ensureElement<HTMLElement>('.basket__price', container);
+        this.buttonElement = ensureElement<HTMLButtonElement>('.basket__button', container);
 
         this.buttonElement.addEventListener('click', () => {
-            this.events.emit('order:submit');
+            this.events.emit('basket:checkout');
         });
     }
 
     set items(items: HTMLElement[]) {
-        this.listElement.innerHTML = '';
-        items.forEach(item => this.listElement.appendChild(item));
+        this.listElement.replaceChildren(...items);
     }
 
     set total(value: number) {
-        this.setText(this.totalElement, `${value} синапсов`);
-        this.buttonElement.disabled = value === 0;
+        if (this.totalElement) {
+            this.totalElement.textContent = `${value} синапсов`;
+        }
     }
 
     set disabled(value: boolean) {

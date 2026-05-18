@@ -1,4 +1,5 @@
 import { Component } from "../base/Component";
+import { ensureElement } from '../../utils/utils';
 import { IEvents } from "../base/Events";
  
 export class Modal extends Component<{}> {
@@ -7,8 +8,8 @@ export class Modal extends Component<{}> {
 
     constructor(container: HTMLElement, protected events: IEvents) {
         super(container);
-        this.modalContainer = container.querySelector('.modal__content') as HTMLElement;
-        this.closeButton = container.querySelector('.modal__close') as HTMLButtonElement;
+        this.modalContainer = ensureElement<HTMLElement>('.modal__content', container);
+        this.closeButton = ensureElement<HTMLButtonElement>('.modal__close', container);
 
         this.closeButton.addEventListener('click', () => this.close());
         container.addEventListener('click', (event) => {
@@ -18,21 +19,15 @@ export class Modal extends Component<{}> {
 
     open(): void {
         this.container.classList.add('modal_active');
-        this.events.emit('modal:open');
     }
 
     close(): void {
         this.container.classList.remove('modal_active');
         this.modalContainer.innerHTML = '';
-        this.events.emit('modal:close');
     }
 
     setContent(content: HTMLElement): void {
         this.modalContainer.innerHTML = '';
         this.modalContainer.appendChild(content);
-    }
-
-    render(): HTMLElement {
-        return this.container;
     }
 }

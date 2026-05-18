@@ -52,11 +52,6 @@ export interface ICardData {
     index?: number;
 }
 
-export interface ICardActions {
-    onClick?: (event: MouseEvent) => void;
-    onAddToBasket?: (event: MouseEvent) => void;
-}
-
 export interface IOrderFormData {
     payment: 'card' | 'cash';
     address: string;

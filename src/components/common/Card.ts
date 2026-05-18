@@ -1,51 +1,36 @@
 import { Component } from '../base/Component';
-import { ICardActions } from '../../types';
+import { ensureElement } from '../../utils/utils';
 import { IEvents } from '../base/Events';
 
 export class Card<T> extends Component<T> {
     protected titleElement: HTMLElement;
     protected priceElement: HTMLElement;
-    protected buttonElement: HTMLButtonElement;
-    protected _id: string = '';
-    protected actions?: ICardActions;
 
-    constructor(container: HTMLElement, protected events: IEvents, actions?: ICardActions) {
+    constructor(container: HTMLElement, protected events: IEvents, onClick?: (event: MouseEvent) => void) {
         super(container);
-        this.titleElement = container.querySelector('.card__title') as HTMLElement;
-        this.priceElement = container.querySelector('.card__price') as HTMLElement;
-        this.buttonElement = container.querySelector('.card__button') as HTMLButtonElement;
-        this.actions = actions;
+        this.titleElement = ensureElement<HTMLElement>('.card__title', container);
+        this.priceElement = ensureElement<HTMLElement>('.card__price', container);
 
-        if (this.buttonElement) {
-            this.buttonElement.addEventListener('click', (event) => {
-                event.stopPropagation();
-                this.events.emit('card:add-to-basket', { id: this._id });
-            });
+        if (onClick) {
+            container.addEventListener('click', onClick);
         }
-
-        container.addEventListener('click', () => {
-            this.events.emit('card:select', { id: this._id });
-        });
-    }
-
-    set id(value: string) {
-        this._id = value;
-    }
-
-    get id(): string {
-        return this._id;
     }
 
     set title(value: string) {
-        this.setText(this.titleElement, value);
+        if (this.titleElement) {
+            this.titleElement.textContent = value;
+        }
     }
 
     set price(value: number | null) {
         if (value === null) {
-            this.setText(this.priceElement, 'Бесценно');
-            if (this.buttonElement) this.buttonElement.disabled = true;
+            if (this.priceElement) {
+                this.priceElement.textContent = 'Бесценно';
+            }
         } else {
-            this.setText(this.priceElement, `${value} синапсов`);
+            if (this.priceElement) {
+                this.priceElement.textContent = `${value} синапсов`;
+            }
         }
     }
 }

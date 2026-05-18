@@ -12,20 +12,20 @@ export class Basket {
 
   addProduct(product: IProduct): void {
     this.items.push(product);
-    this.events.emit('basket:changed', { items: this.items });
+    this.events.emit('basket:changed');
   }
 
   deleteProduct(productId: string): void {
     const index = this.items.findIndex((item) => item.id === productId);
     if (index !== -1) {
       this.items.splice(index, 1);
-      this.events.emit('basket:changed', { items: this.items });
+      this.events.emit('basket:changed');
     }
   }
 
   clearBasket(): void {
     this.items = [];
-    this.events.emit('basket:changed', { items: this.items });
+    this.events.emit('basket:changed');
   }
 
   getSummProduct(): number {

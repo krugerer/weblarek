@@ -1,4 +1,5 @@
 import { Form } from "../common/Form";
+import { ensureElement } from '../../utils/utils';
 import { IContactsFormData } from "../../types";
 import { IEvents } from "../base/Events";
 
@@ -11,12 +12,14 @@ export class ContactsForm extends Form<IContactsFormData> {
     protected events: IEvents,
   ) {
     super(container, events);
-    this.emailInput = container.querySelector(
+    this.emailInput = ensureElement<HTMLInputElement>(
       'input[name="email"]',
-    ) as HTMLInputElement;
-    this.phoneInput = container.querySelector(
+      container,
+    );
+    this.phoneInput = ensureElement<HTMLInputElement>(
       'input[name="phone"]',
-    ) as HTMLInputElement;
+      container,
+    );
 
     this.emailInput.addEventListener("input", () => {
       this.events.emit("contacts:change", this.getFormData());
@@ -28,12 +31,11 @@ export class ContactsForm extends Form<IContactsFormData> {
 
     this.container.addEventListener("submit", (event) => {
       event.preventDefault();
-      if (this.submitButton.disabled) return;
-      this.events.emit("contacts:submit", this.getFormData()); // ← должно быть
+      this.events.emit("contacts:submit-form");
     });
   }
 
-  getFormData(): IContactsFormData {
+  protected getFormData(): IContactsFormData {
     return {
       email: this.emailInput.value,
       phone: this.phoneInput.value,
@@ -42,17 +44,9 @@ export class ContactsForm extends Form<IContactsFormData> {
 
   set email(value: string) {
     this.emailInput.value = value;
-    this.checkValidation();
   }
 
   set phone(value: string) {
     this.phoneInput.value = value;
-    this.checkValidation();
-  }
-
-  protected checkValidation(): void {
-    const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.emailInput.value);
-    const phoneValid = this.phoneInput.value.trim().length > 0;
-    this.setValid(emailValid && phoneValid);
   }
 }

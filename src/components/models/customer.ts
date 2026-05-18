@@ -16,7 +16,7 @@ export class CustomerModel {
     if (data.email !== undefined) this.email = data.email;
     if (data.phone !== undefined) this.phone = data.phone;
     if (data.address !== undefined) this.address = data.address;
-    this.events.emit('customer:changed', this.getData());
+    this.events.emit('customer:changed');
   }
 
   getData(): ICustomer {
@@ -33,7 +33,7 @@ export class CustomerModel {
     this.email = "";
     this.phone = "";
     this.address = "";
-    this.events.emit('customer:changed', this.getData());
+    this.events.emit('customer:changed');
   }
 
   validate(): TValidation {

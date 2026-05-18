@@ -1,4 +1,5 @@
 import { Component } from '../base/Component';
+import { ensureElement } from '../../utils/utils';
 import { IHeaderData } from '../../types';
 import { IEvents } from '../base/Events';
 
@@ -8,8 +9,8 @@ export class Header extends Component<IHeaderData> {
 
     constructor(container: HTMLElement, protected events: IEvents) {
         super(container);
-        this.basketButton = container.querySelector('.header__basket') as HTMLButtonElement;
-        this.counterElement = container.querySelector('.header__basket-counter') as HTMLElement;
+        this.basketButton = ensureElement<HTMLButtonElement>('.header__basket', container);
+        this.counterElement = ensureElement<HTMLElement>('.header__basket-counter', container);
 
         this.basketButton.addEventListener('click', () => {
             this.events.emit('basket:open');
@@ -17,6 +18,8 @@ export class Header extends Component<IHeaderData> {
     }
 
     set counter(value: number) {
-        this.setText(this.counterElement, value.toString());
+        if (this.counterElement) {
+            this.counterElement.textContent = value.toString();
+        }
     }
 }
