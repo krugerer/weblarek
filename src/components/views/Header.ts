@@ -18,8 +18,6 @@ export class Header extends Component<IHeaderData> {
     }
 
     set counter(value: number) {
-        if (this.counterElement) {
-            this.counterElement.textContent = value.toString();
-        }
+        this.counterElement.textContent = value.toString();
     }
 }

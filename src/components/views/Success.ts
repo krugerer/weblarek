@@ -1,12 +1,11 @@
 import { Component } from '../base/Component';
 import { ensureElement } from '../../utils/utils';
-import { ISuccessData, ISuccessActions } from '../../types';
+import { ISuccessData } from '../../types';
 import { IEvents } from '../base/Events';
 
 export class Success extends Component<ISuccessData> {
     protected totalElement: HTMLElement;
     protected closeButton: HTMLButtonElement;
-    protected actions?: ISuccessActions;
 
     constructor(container: HTMLElement, protected events: IEvents) {
         super(container);
@@ -19,8 +18,6 @@ export class Success extends Component<ISuccessData> {
     }
 
     set total(value: number) {
-        if (this.totalElement) {
-            this.totalElement.textContent = `Списано ${value} синапсов`;
-        }
+        this.totalElement.textContent = `Списано ${value} синапсов`;
     }
 }

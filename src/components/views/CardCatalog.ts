@@ -9,22 +9,24 @@ export class CardCatalog extends Card<ICardData> {
     protected imageElement: HTMLImageElement;
 
     constructor(container: HTMLElement, events: IEvents, onClick?: (event: MouseEvent) => void) {
-        super(container, events, onClick);
+        super(container, events);
         this.categoryElement = ensureElement<HTMLElement>('.card__category', container);
         this.imageElement = ensureElement<HTMLImageElement>('.card__image', container);
+
+        if (onClick) {
+            container.addEventListener('click', onClick);
+        }
     }
 
     set category(value: string) {
-        if (this.categoryElement) {
-            this.categoryElement.textContent = value;
-        }
+        this.categoryElement.textContent = value;
         const modifier = categoryMap[value as keyof typeof categoryMap];
         if (modifier) {
             this.categoryElement.classList.add(modifier);
         }
     }
 
-    set image(value: string) {
-        this.setImage(this.imageElement, value, this.titleElement.textContent || '');
+    set image(value: { src: string; alt: string }) {
+        this.setImage(this.imageElement, value.src, value.alt);
     }
 }

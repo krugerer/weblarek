@@ -55,7 +55,12 @@ const cardPreviewElement = cloneTemplate<HTMLElement>(cardPreviewTemplate);
 const cardPreview = new CardPreview(cardPreviewElement, events, () => {
   const product = catalog.getSelectedProduct();
   if (product) {
-    events.emit("card:add-to-basket", { id: product.id });
+    if (basket.hasProduct(product.id)) {
+      basket.deleteProduct(product.id);
+    } else {
+      basket.addProduct(product);
+    }
+    modal.close();
   }
 });
 
@@ -79,7 +84,7 @@ function createCardCatalog(product: IProduct): HTMLElement {
   card.title = product.title;
   card.price = product.price;
   card.category = product.category;
-  card.image = CDN_URL + product.image;
+  card.image = { src: CDN_URL + product.image, alt: product.title };
   return card.render();
 }
 
@@ -96,36 +101,21 @@ events.on("card:select", (data: { id: string }) => {
 events.on("catalog:selected", () => {
   const product = catalog.getSelectedProduct();
   if (product) {
-    cardPreview.title = product.title;
-    cardPreview.price = product.price;
-    cardPreview.category = product.category;
-    cardPreview.image = CDN_URL + product.image;
-    cardPreview.description = product.description || "";
-
     const isInBasket = basket.hasProduct(product.id);
-
-    if (isInBasket) {
-      cardPreview.updateButton("Удалить из корзины", () => {
-        basket.deleteProduct(product.id);
-        modal.close();
-      });
-    } else {
-      cardPreview.updateButton("В корзину", () => {
-        basket.addProduct(product);
-        modal.close();
-      });
-    }
+    cardPreview.render({
+      title: product.title,
+      price: product.price,
+      category: product.category,
+      image: {
+        src: CDN_URL + product.image,
+        alt: product.title
+      },
+      description: product.description || "",
+      buttonText: isInBasket ? "Удалить из корзины" : "В корзину",
+    });
 
     modal.setContent(cardPreview.render());
     modal.open();
-  }
-});
-
-events.on("card:add-to-basket", (data: { id: string }) => {
-  const product = catalog.getProductById(data.id);
-  if (product) {
-    basket.addProduct(product);
-    modal.close();
   }
 });
 
@@ -154,26 +144,14 @@ events.on("basket:changed", () => {
 });
 
 events.on("basket:open", () => {
-  updateBasketView();
   modal.setContent(basketView.render());
   modal.open();
 });
 
 events.on("basket:checkout", () => {
-  const customerData = customer.getData();
-  if (customerData.address) orderForm.address = customerData.address;
-  if (customerData.payment) orderForm.payment = customerData.payment;
-
-  const isValid = !!(customerData.payment && customerData.address);
-  orderForm.valid = isValid;
-  orderForm.showError(
-    isValid
-      ? ""
-      : !customerData.payment
-        ? "Выберите способ оплаты"
-        : "Введите адрес доставки",
-  );
-
+  const errors = customer.validate();
+  orderForm.valid = !errors.payment && !errors.address;
+  orderForm.showError(errors.payment || errors.address || "");
   modal.setContent(orderForm.render());
   modal.open();
 });
@@ -182,45 +160,33 @@ events.on(
   "order:change",
   (data: { payment?: "card" | "cash"; address?: string }) => {
     customer.setData(data);
-
-    const customerData = customer.getData();
-    const isValid = !!(customerData.payment && customerData.address);
-
-    orderForm.valid = isValid;
-
-    if (!isValid) {
-      if (!customerData.payment) {
-        orderForm.showError("Выберите способ оплаты");
-      } else if (!customerData.address) {
-        orderForm.showError("Введите адрес доставки");
-      }
-    } else {
-      orderForm.showError("");
-    }
   },
 );
 
-events.on("order:submit", () => {
+events.on("customer:changed", () => {
   const customerData = customer.getData();
-  if (customerData.email) contactsForm.email = customerData.email;
-  if (customerData.phone) contactsForm.phone = customerData.phone;
+  const errors = customer.validate();
 
-  const isValid = !!(customerData.email && customerData.phone);
-  contactsForm.valid = isValid;
+  orderForm.address = customerData.address || "";
+  orderForm.payment = customerData.payment;
+  orderForm.valid = !errors.payment && !errors.address;
+  orderForm.showError(errors.payment || errors.address || "");
 
+  contactsForm.email = customerData.email || "";
+  contactsForm.phone = customerData.phone || "";
+  contactsForm.valid = !errors.email && !errors.phone;
+  contactsForm.showError(errors.email || errors.phone || "");
+});
+
+events.on("order:submit", () => {
   modal.setContent(contactsForm.render());
 });
 
-events.on("contacts:change", (data: { email: string; phone: string }) => {
-  customer.setData({ email: data.email, phone: data.phone });
-
-  const customerData = customer.getData();
-  const isValid = !!(customerData.email && customerData.phone);
-
-  contactsForm.valid = isValid;
-  contactsForm.showError(
-    isValid ? "" : !customerData.email ? "Введите email" : "Введите телефон",
-  );
+events.on("contacts:change", (data: { email?: string; phone?: string }) => {
+  customer.setData({
+    email: data.email !== undefined ? data.email : customer.getData().email,
+    phone: data.phone !== undefined ? data.phone : customer.getData().phone,
+  });
 });
 
 events.on("contacts:submit-form", async () => {

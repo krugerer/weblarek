@@ -1,6 +1,6 @@
 import { Form } from "../common/Form";
 import { ensureElement } from "../../utils/utils";
-import { IOrderFormData } from "../../types";
+import { IOrderFormData, TPayment } from "../../types";
 import { IEvents } from "../base/Events";
 
 export class OrderForm extends Form<IOrderFormData> {
@@ -32,8 +32,12 @@ export class OrderForm extends Form<IOrderFormData> {
       container,
     );
 
-    this.cardButton.addEventListener("click", () => this.setPayment("card"));
-    this.cashButton.addEventListener("click", () => this.setPayment("cash"));
+    this.cardButton.addEventListener("click", () => {
+      this.events.emit("order:change", { payment: "card" });
+    });
+    this.cashButton.addEventListener("click", () => {
+      this.events.emit("order:change", { payment: "cash" });
+    });
 
     this.addressInput.addEventListener("input", () => {
       this.events.emit("order:change", { address: this.addressInput.value });
@@ -44,18 +48,16 @@ export class OrderForm extends Form<IOrderFormData> {
     this.addressInput.value = value;
   }
 
-  set payment(value: "card" | "cash") {
+  set payment(value: TPayment) {
     if (value === "card") {
       this.cardButton.classList.add("button_alt-active");
       this.cashButton.classList.remove("button_alt-active");
-    } else {
+    } else if (value === "cash") {
       this.cashButton.classList.add("button_alt-active");
       this.cardButton.classList.remove("button_alt-active");
+    } else {
+      this.cardButton.classList.remove("button_alt-active");
+      this.cashButton.classList.remove("button_alt-active");
     }
-  }
-
-  private setPayment(value: "card" | "cash"): void {
-    this.payment = value;
-    this.events.emit("order:change", { payment: value });
   }
 }

@@ -46,10 +46,11 @@ export interface ICardData {
     id: string;
     title: string;
     price: number | null;
-    image?: string;
+    image?: { src: string; alt: string };
     category?: string;
     description?: string;
     index?: number;
+    buttonText?: string;
 }
 
 export interface IOrderFormData {
@@ -62,13 +63,10 @@ export interface IContactsFormData {
     phone: string;
 }
 
-export interface ISuccessActions {
-    onClick: () => void;
-}
-
 export interface IBasketData {
     items: HTMLElement[];
     total: number;
+    disabled: boolean;
 }
 
 export interface IHeaderData {
@@ -81,4 +79,8 @@ export interface IGalleryData {
 
 export interface ISuccessData {
     total: number;
+}
+
+export interface IForm {
+  valid: boolean;
 }

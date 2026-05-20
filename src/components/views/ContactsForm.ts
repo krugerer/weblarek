@@ -22,24 +22,17 @@ export class ContactsForm extends Form<IContactsFormData> {
     );
 
     this.emailInput.addEventListener("input", () => {
-      this.events.emit("contacts:change", this.getFormData());
+      this.events.emit("contacts:change", { email: this.emailInput.value });
     });
 
     this.phoneInput.addEventListener("input", () => {
-      this.events.emit("contacts:change", this.getFormData());
+      this.events.emit("contacts:change", { phone: this.phoneInput.value });
     });
 
     this.container.addEventListener("submit", (event) => {
       event.preventDefault();
       this.events.emit("contacts:submit-form");
     });
-  }
-
-  protected getFormData(): IContactsFormData {
-    return {
-      email: this.emailInput.value,
-      phone: this.phoneInput.value,
-    };
   }
 
   set email(value: string) {

@@ -12,11 +12,6 @@ export class Form<T extends object> extends Component<T> {
         this.submitButton = ensureElement<HTMLButtonElement>('button[type="submit"]', container);
         this.errorElement = ensureElement<HTMLElement>('.form__errors', container);
         this.inputs = ensureAllElements<HTMLInputElement>('input', container);
-
-        container.addEventListener('submit', (event) => {
-            event.preventDefault();
-            this.events.emit('form:submit');
-        });
     }
 
     set valid(isValid: boolean) {
@@ -24,8 +19,6 @@ export class Form<T extends object> extends Component<T> {
     }
 
     showError(message: string): void {
-        if (this.errorElement) {
-            this.errorElement.textContent = message;
-        }
+        this.errorElement.textContent = message;
     }
 }
